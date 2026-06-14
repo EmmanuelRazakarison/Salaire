@@ -1,2 +1,2 @@
 # Salaire
-Calculer la salaire d'un employeur
+Calculer le salaire d'un employeur
