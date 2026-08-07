@@ -42,11 +42,12 @@ export function useSalaryCalculation() {
   const { data: isServerOnline = false } = useQuery({
     queryKey: ["backend-health"],
     queryFn: checkBackendHealth,
-    refetchInterval: 10000, // Vérifier toutes les 10s
+    refetchInterval: 10000,
     staleTime: 5000,
   });
 
   const [apiResult, setApiResult] = useState<SalaryResult | null>(null);
+  const [isCalculating, setIsCalculating] = useState<boolean>(false);
 
   // Basculer entre les modes
   const toggleMode = useCallback(() => {
@@ -57,6 +58,7 @@ export function useSalaryCalculation() {
   // Appliquer une valeur préréglée
   const applyPreset = useCallback(
     (amount: number) => {
+      setIsCalculating(true);
       if (isNetToGross) {
         setValue("netSalary", amount.toString(), { shouldValidate: true });
       } else {
@@ -70,6 +72,7 @@ export function useSalaryCalculation() {
   const reset = useCallback(() => {
     formReset(DEFAULT_FORM_VALUES);
     setApiResult(null);
+    setIsCalculating(false);
   }, [formReset]);
 
   // Inputs structurés
@@ -91,6 +94,12 @@ export function useSalaryCalculation() {
       isNetToGross: Boolean(isNetToGross),
     };
   }, [grossSalary, netSalary, bonuses, allowances, otherGains, dependents, isNetToGross]);
+
+  // Has valid input entered
+  const hasInput = Boolean(
+    (isNetToGross && currentInput.netSalary && currentInput.netSalary > 0) ||
+    (!isNetToGross && currentInput.grossSalary && currentInput.grossSalary > 0)
+  );
 
   // Calcul local réactif immédiat
   const localResult: SalaryResult | null = useMemo(() => {
@@ -115,28 +124,41 @@ export function useSalaryCalculation() {
     );
   }, [currentInput, isNetToGross]);
 
-  // Tenter le calcul API en arrière-plan si le serveur est en ligne
+  // Gérer l'état de chargement / calcul API
   useEffect(() => {
-    if (!isServerOnline || !localResult) {
+    if (!hasInput) {
+      setIsCalculating(false);
       setApiResult(null);
       return;
     }
 
+    if (!isServerOnline) {
+      setIsCalculating(false);
+      return;
+    }
+
+    setIsCalculating(true);
     let isMounted = true;
     const timer = setTimeout(async () => {
       try {
         const remote = await calculateSalaryApi(currentInput);
-        if (isMounted) setApiResult(remote);
+        if (isMounted) {
+          setApiResult(remote);
+          setIsCalculating(false);
+        }
       } catch {
-        if (isMounted) setApiResult(null);
+        if (isMounted) {
+          setApiResult(null);
+          setIsCalculating(false);
+        }
       }
-    }, 400);
+    }, 250);
 
     return () => {
       isMounted = false;
       clearTimeout(timer);
     };
-  }, [isServerOnline, currentInput, localResult]);
+  }, [isServerOnline, currentInput, hasInput]);
 
   // Le résultat final utilise le serveur si disponible, sinon le local
   const activeResult = apiResult || localResult;
@@ -157,6 +179,8 @@ export function useSalaryCalculation() {
     currentInput,
     isNetToGross,
     isServerOnline,
+    isCalculating: isCalculating && hasInput,
+    hasInput,
     toggleMode,
     applyPreset,
     reset,

@@ -82,16 +82,16 @@ export function CalculatorForm({
 
           {/* Boutons de raccourci rapide */}
           {onApplyPreset && (
-            <div className="mt-3 flex items-center gap-1.5 flex-wrap">
-              <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                <Zap className="h-3 w-3 text-amber-500" /> Préréglages :
+            <div className="mt-3.5 flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
+                <Zap className="h-3.5 w-3.5 text-amber-500 fill-amber-400" /> Préréglages :
               </span>
               {PRESETS.map((preset) => (
                 <button
                   key={preset.value}
                   type="button"
                   onClick={() => onApplyPreset(preset.value)}
-                  className="text-xs px-2 py-0.5 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 dark:hover:bg-emerald-950/40 transition-colors font-medium shadow-xs"
+                  className="text-xs px-2.5 py-1 rounded-lg bg-white dark:bg-gray-800 text-emerald-950 dark:text-emerald-100 font-bold border border-emerald-300 dark:border-emerald-700/60 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 dark:hover:bg-emerald-500 dark:hover:text-white transition-all shadow-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer active:scale-95"
                 >
                   {preset.label}
                 </button>

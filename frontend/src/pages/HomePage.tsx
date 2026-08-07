@@ -1,8 +1,9 @@
 import { useEffect, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Header } from "../components/Header";
 import { CalculatorForm } from "../components/CalculatorForm";
 import { ResultsPanel } from "../components/ResultsPanel";
+import { ResultsSkeleton } from "../components/ResultsSkeleton";
 import { HistoryPanel } from "../components/HistoryPanel";
 import { useSalaryCalculation } from "../hooks/useSalaryCalculation";
 import { useHistory } from "../hooks/useHistory";
@@ -18,6 +19,7 @@ export function HomePage() {
     currentInput,
     isNetToGross,
     isServerOnline,
+    isCalculating,
     toggleMode,
     applyPreset,
   } = useSalaryCalculation();
@@ -108,44 +110,51 @@ export function HomePage() {
             </motion.div>
           </div>
 
-          {/* Colonne droite : Résultats & Bulletin */}
+          {/* Colonne droite : Résultats & Bulletin ou Skeleton */}
           <div className="lg:col-span-7">
-            {result ? (
-              <ResultsPanel
-                result={result}
-                isNetToGross={isNetToGross}
-                onSave={handleSave}
-              />
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.15 }}
-                className="flex flex-col items-center justify-center py-24 text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-800/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700/50 shadow-xs"
-              >
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-50 dark:from-emerald-950/40 dark:to-teal-900/20 flex items-center justify-center mb-4 shadow-sm border border-emerald-200/50 dark:border-emerald-800/30">
-                  <svg
-                    className="w-8 h-8 text-emerald-500"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-bold text-gray-700 dark:text-gray-300 mb-1">
-                  Calculateur de salaire prêt
-                </h3>
-                <p className="text-sm text-center max-w-xs text-gray-500 dark:text-gray-400">
-                  Saisissez un montant ou cliquez sur un préréglage rapide pour générer le décompte des cotisations.
-                </p>
-              </motion.div>
-            )}
+            <AnimatePresence mode="wait">
+              {isCalculating ? (
+                <ResultsSkeleton key="skeleton" />
+              ) : result ? (
+                <ResultsPanel
+                  key="results"
+                  result={result}
+                  isNetToGross={isNetToGross}
+                  onSave={handleSave}
+                />
+              ) : (
+                <motion.div
+                  key="empty"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex flex-col items-center justify-center py-24 text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-800/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700/50 shadow-xs"
+                >
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-50 dark:from-emerald-950/40 dark:to-teal-900/20 flex items-center justify-center mb-4 shadow-sm border border-emerald-200/50 dark:border-emerald-800/30">
+                    <svg
+                      className="w-8 h-8 text-emerald-500"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-700 dark:text-gray-300 mb-1">
+                    Calculateur de salaire prêt
+                  </h3>
+                  <p className="text-sm text-center max-w-xs text-gray-500 dark:text-gray-400">
+                    Saisissez un montant ou cliquez sur un préréglage rapide pour générer le décompte des cotisations.
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
