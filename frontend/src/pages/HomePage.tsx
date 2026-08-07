@@ -121,6 +121,7 @@ export function HomePage() {
                   result={result}
                   isNetToGross={isNetToGross}
                   onSave={handleSave}
+                  history={history}
                 />
               ) : (
                 <motion.div
