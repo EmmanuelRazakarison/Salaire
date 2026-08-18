@@ -1,28 +1,108 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   :root {
-    --color-emerald-50: #ecfdf5;
-    --color-emerald-100: #d1fae5;
-    --color-emerald-200: #a7f3d0;
-    --color-emerald-300: #6ee7b7;
-    --color-emerald-400: #34d399;
-    --color-emerald-500: #10b981;
-    --color-emerald-600: #059669;
-    --color-emerald-700: #047857;
-    --color-emerald-800: #065f46;
-    --color-emerald-900: #064e3b;
+    --bg-app: #F7F5F0;
+    --surface-ledger: #FFFFFF;
+    --surface-subtle: #F4F1EA;
+    --border-hairline: #E2DDD5;
+    --border-strong: #C8C1B4;
+    --ink-primary: #24221F;
+    --ink-secondary: #666159;
+    --ink-muted: #9E978C;
+    --accent-validated: #3F7D5C;
+    --accent-validated-subtle: #EBF4EF;
+    --accent-validated-dark: #2F6347;
+    --accent-deduction: #A3483C;
+    --accent-charge: #3B647A;
+  }
+
+  .dark {
+    --bg-app: #12181F;
+    --surface-ledger: #18202A;
+    --surface-subtle: #141C25;
+    --border-hairline: #24303E;
+    --border-strong: #334457;
+    --ink-primary: #EAE7E1;
+    --ink-secondary: #9E9A90;
+    --ink-muted: #67635A;
+    --accent-validated: #4E9B73;
+    --accent-validated-subtle: #162B21;
+    --accent-validated-dark: #62BD8F;
+    --accent-deduction: #D96859;
+    --accent-charge: #5F8DA8;
+  }
+
+  body {
+    background-color: var(--bg-app);
+    color: var(--ink-primary);
+    font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overscroll-behavior-y: none;
   }
 }
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif: "Newsreader", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Tabular numbers for all monetary amounts */
+.tabular-nums, .font-mono {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Ledger border rules */
+.ledger-double-line {
+  border-bottom: 3px double currentColor;
+}
+
+.ledger-hairline-t {
+  border-top: 1px solid var(--border-hairline);
+}
+
+.ledger-hairline-b {
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+/* Stamp / Seal validation motif */
+.stamp-seal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border: 1.5px solid #3F7D5C;
+  color: #3F7D5C;
+  padding: 0.25rem 0.625rem;
+  border-radius: 4px;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.6875rem;
+  position: relative;
+  background-color: rgba(63, 125, 92, 0.06);
+}
+
+.dark .stamp-seal {
+  border-color: #4E9B73;
+  color: #4E9B73;
+  background-color: rgba(78, 155, 115, 0.12);
 }
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -30,43 +110,25 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  background: #D4CEBF;
+  border-radius: 2px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: #2D3B4C;
 }
 
-/* Smooth number input - hide spinners */
+/* Hide number input arrows cleanly */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
-  opacity: 0.5;
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 
-input[type="number"]:focus::-webkit-inner-spin-button,
-input[type="number"]:focus::-webkit-outer-spin-button {
-  opacity: 1;
-}
-
-/* Selection */
-::selection {
-  background-color: #10b981;
-  color: white;
-}
-
-/* Animations globales */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
+/* Minimal functional transition */
+.transition-ledger {
+  transition: all 0.15s ease-out;
 }

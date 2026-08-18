@@ -8,7 +8,7 @@ const Separator = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "shrink-0 bg-gray-200 dark:bg-gray-700",
+      "shrink-0 bg-[#E2DDD5] dark:bg-[#24303E]",
       orientation === "horizontal" ? "h-[1px] w-full" : "h-full w-[1px]",
       className
     )}
@@ -18,3 +18,4 @@ const Separator = React.forwardRef<
 Separator.displayName = "Separator";
 
 export { Separator };
+

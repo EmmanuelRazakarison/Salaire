@@ -1,70 +1,94 @@
-import { Calculator, Server, WifiOff } from "lucide-react";
+import { BookOpen, Shield, Bell } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
+import { Button } from "./ui/button";
 
 interface HeaderProps {
   isServerOnline?: boolean;
+  isPinEnabled?: boolean;
+  onOpenSecurity?: () => void;
+  onOpenPayReminder?: () => void;
 }
 
-export function Header({ isServerOnline = false }: HeaderProps) {
+export function Header({
+  isServerOnline = false,
+  isPinEnabled = false,
+  onOpenSecurity,
+  onOpenPayReminder,
+}: HeaderProps) {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-700/50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl transition-all duration-300">
-      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-emerald-700 shadow-md shadow-emerald-500/20 dark:shadow-emerald-900/40 text-white font-bold">
-            <Calculator className="h-5 w-5" />
+    <header className="sticky top-0 z-40 w-full border-b border-[#E2DDD5] dark:border-[#24303E] bg-[#F7F5F0]/95 dark:bg-[#12181F]/95 backdrop-blur-md transition-colors">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 h-14 sm:h-15 flex items-center justify-between">
+        {/* Titre & Logo Institutionnel */}
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-sm bg-[#18202A] dark:bg-[#EAE7E1] text-[#F7F5F0] dark:text-[#12181F] border border-[#24303E] dark:border-[#E2DDD5]">
+            <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg font-bold text-gray-900 dark:text-white leading-tight">
-                Salaire Mada
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <h1 className="font-serif text-sm sm:text-lg font-bold tracking-tight text-[#24221F] dark:text-[#EAE7E1]">
+                SALAIRE MADA
               </h1>
-              <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40">
-                2026
+              <span className="text-[9px] sm:text-[10px] font-mono font-bold tracking-wider px-1.5 py-0.5 rounded-sm bg-[#EBF4EF] dark:bg-[#162B21] text-[#2F6347] dark:text-[#62BD8F] border border-[#3F7D5C]/30">
+                2026 · MGA
               </span>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
-              Calcul du salaire brut & net - Réglementation Malagasy
+            <p className="text-[10px] sm:text-[11px] font-medium text-[#666159] dark:text-[#9E9A90] hidden md:block">
+              Registre de calcul salarial conforme au Code du Travail & Barème IRSA
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* Badge de statut du serveur */}
+        {/* Contrôles & Statut */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Bouton Rappel de Paie */}
+          {onOpenPayReminder && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onOpenPayReminder}
+              className="h-8 w-8 rounded-sm text-[#666159] dark:text-[#9E9A90] hover:text-[#24221F]"
+              title="Configurer un rappel de paie mensuel"
+            >
+              <Bell className="h-3.5 w-3.5" />
+            </Button>
+          )}
+
+          {/* Bouton Sécurité PIN */}
+          {onOpenSecurity && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onOpenSecurity}
+              className={`h-8 w-8 rounded-sm ${
+                isPinEnabled
+                  ? "text-[#3F7D5C] dark:text-[#4E9B73] border-[#3F7D5C]/40"
+                  : "text-[#666159] dark:text-[#9E9A90]"
+              }`}
+              title={isPinEnabled ? "Verrouillage PIN actif" : "Configurer le code PIN de sécurité"}
+            >
+              <Shield className="h-3.5 w-3.5" />
+            </Button>
+          )}
+
+          {/* Indicateur de serveur / mode local */}
           <div
             title={
               isServerOnline
-                ? "Connecté au backend FastAPI"
-                : "Mode hors-ligne - Calculateur local actif"
+                ? "Connecté au moteur backend FastAPI (SQLite)"
+                : "Moteur de calcul autonome local actif"
             }
-            className={`flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border transition-colors ${
+            className={`flex items-center gap-1 text-[10px] sm:text-[11px] font-mono font-medium px-1.5 sm:px-2 py-1 rounded-sm border transition-colors ${
               isServerOnline
-                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/50"
-                : "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/40"
+                ? "bg-[#EBF4EF] dark:bg-[#162B21] text-[#2F6347] dark:text-[#62BD8F] border-[#3F7D5C]/30"
+                : "bg-[#F4F1EA] dark:bg-[#141C25] text-[#666159] dark:text-[#9E9A90] border-[#E2DDD5] dark:border-[#24303E]"
             }`}
           >
-            <span className="relative flex h-2 w-2">
-              <span
-                className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                  isServerOnline ? "bg-emerald-400" : "bg-amber-400"
-                }`}
-              />
-              <span
-                className={`relative inline-flex rounded-full h-2 w-2 ${
-                  isServerOnline ? "bg-emerald-500" : "bg-amber-500"
-                }`}
-              />
-            </span>
-            {isServerOnline ? (
-              <>
-                <Server className="h-3.5 w-3.5 hidden sm:inline" />
-                <span>Serveur API</span>
-              </>
-            ) : (
-              <>
-                <WifiOff className="h-3.5 w-3.5 hidden sm:inline" />
-                <span>Mode Local</span>
-              </>
-            )}
+            <span
+              className={`inline-block h-1.5 w-1.5 rounded-full ${
+                isServerOnline ? "bg-[#3F7D5C] dark:bg-[#4E9B73]" : "bg-[#9E978C] dark:bg-[#67635A]"
+              }`}
+            />
+            <span className="hidden xs:inline">{isServerOnline ? "API" : "Local"}</span>
           </div>
 
           <ThemeToggle />

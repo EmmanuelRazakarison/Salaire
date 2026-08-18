@@ -8,7 +8,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-2xl border border-gray-200 dark:border-gray-700/50 bg-white dark:bg-gray-800/80 shadow-sm backdrop-blur-sm transition-all duration-200 hover:shadow-md",
+      "rounded-lg border border-[#E2DDD5] dark:border-[#24303E] bg-[#FFFFFF] dark:bg-[#18202A] text-[#24221F] dark:text-[#EAE7E1] transition-colors",
       className
     )}
     {...props}
@@ -22,7 +22,10 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-6 pb-0", className)}
+    className={cn(
+      "flex flex-col space-y-1 p-4 sm:p-5 border-b border-[#E2DDD5] dark:border-[#24303E]",
+      className
+    )}
     {...props}
   />
 ));
@@ -35,7 +38,7 @@ const CardTitle = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "text-xl font-semibold leading-none tracking-tight text-gray-900 dark:text-gray-100",
+      "font-serif text-base sm:text-lg font-semibold tracking-tight text-[#24221F] dark:text-[#EAE7E1]",
       className
     )}
     {...props}
@@ -49,7 +52,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-sm text-gray-500 dark:text-gray-400", className)}
+    className={cn("text-xs sm:text-sm text-[#666159] dark:text-[#9E9A90]", className)}
     {...props}
   />
 ));
@@ -59,7 +62,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-6 pt-4", className)} {...props} />
+  <div ref={ref} className={cn("p-4 sm:p-5", className)} {...props} />
 ));
 CardContent.displayName = "CardContent";
 
@@ -69,7 +72,10 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center p-6 pt-0", className)}
+    className={cn(
+      "flex items-center p-4 sm:p-5 pt-0 border-t border-[#E2DDD5] dark:border-[#24303E]",
+      className
+    )}
     {...props}
   />
 ));
@@ -83,3 +89,4 @@ export {
   CardDescription,
   CardContent,
 };
+

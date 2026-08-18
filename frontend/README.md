@@ -1,32 +1,23 @@
-# React + TypeScript + Vite
+# 🇲🇬 Salaire Mada (Frontend & Client Tauri)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Consultez la documentation complète et détaillée de l'application dans :
+- [README de l'application Desktop/Mobile (src-tauri)](./src-tauri/README.md)
+- [README principal du projet](../README.md)
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ⚡ Démarrage Rapide
 
-## React Compiler
+```bash
+# 1. Installation des dépendances
+npm install
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+# 2. Lancement en mode Web (Vite)
+npm run dev
 
-## Expanding the Oxlint configuration
+# 3. Lancement en mode Bureau (Tauri)
+npm run tauri dev
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+# 4. Compilation APK Android (Tauri)
+npx @tauri-apps/cli android build -- --apk
 ```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.

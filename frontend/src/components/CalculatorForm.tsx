@@ -1,4 +1,4 @@
-import { DollarSign, Users, Gift, Briefcase, Plus, ArrowLeftRight, Zap } from "lucide-react";
+import { ArrowLeftRight, HelpCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -15,11 +15,11 @@ interface CalculatorFormProps {
 }
 
 const PRESETS = [
-  { label: "SMIG (262k)", value: 262680 },
-  { label: "500k", value: 500000 },
-  { label: "1.2M", value: 1200000 },
-  { label: "2.5M", value: 2500000 },
-  { label: "4M", value: 4000000 },
+  { label: "SMIG (262 680)", value: 262680 },
+  { label: "500 000", value: 500000 },
+  { label: "1 200 000", value: 1200000 },
+  { label: "2 500 000", value: 2500000 },
+  { label: "4 000 000", value: 4000000 },
 ];
 
 export function CalculatorForm({
@@ -32,36 +32,42 @@ export function CalculatorForm({
   const isNetToGross = useWatch({ control, name: "isNetToGross" });
 
   return (
-    <Card className="overflow-hidden shadow-lg border-emerald-100 dark:border-gray-800">
-      <CardHeader className="border-b border-gray-100 dark:border-gray-800 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-100/40 dark:from-emerald-950/20 dark:via-teal-950/20 dark:to-emerald-900/10">
+    <Card className="border border-[#E2DDD5] dark:border-[#24303E]">
+      <CardHeader className="bg-[#FAF8F5] dark:bg-[#141C25] pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <div className="p-1.5 rounded-lg bg-emerald-500 text-white shadow-sm">
-              <DollarSign className="h-4 w-4" />
-            </div>
-            {isNetToGross ? "Calcul Net → Brut" : "Calcul Brut → Net"}
-          </CardTitle>
-          <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 font-semibold border border-emerald-200 dark:border-emerald-800/40">
-            {isNetToGross ? "Recherche de brut" : "Direct"}
+          <div className="space-y-0.5">
+            <span className="text-[10px] font-mono font-bold tracking-widest text-[#666159] dark:text-[#9E9A90] uppercase">
+              Feuille de saisie N° 01
+            </span>
+            <CardTitle className="text-base sm:text-lg">
+              {isNetToGross
+                ? "Recherche du Salaire Brut (Net → Brut)"
+                : "Calcul du Salaire Net (Brut → Net)"}
+            </CardTitle>
+          </div>
+          <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-sm bg-[#F4F1EA] dark:bg-[#1C2530] text-[#24221F] dark:text-[#EAE7E1] border border-[#E2DDD5] dark:border-[#24303E]">
+            {isNetToGross ? "Dichotomie" : "Direct 2026"}
           </span>
         </div>
       </CardHeader>
-      <CardContent className="pt-6 space-y-5">
-        {/* Champ principal */}
-        <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50/70 to-teal-50/70 dark:from-emerald-950/30 dark:to-teal-950/20 border border-emerald-200/60 dark:border-emerald-800/30 shadow-inner">
+
+      <CardContent className="p-4 sm:p-5 space-y-4">
+        {/* Section 1 : Montant Principal */}
+        <div className="p-3.5 rounded-md bg-[#FAF8F5] dark:bg-[#141C25] border border-[#E2DDD5] dark:border-[#24303E] space-y-3">
           {isNetToGross ? (
             <div>
               <Input
                 id="netSalary"
-                label="Salaire net souhaité (MGA)"
+                label="Salaire Net Souhaité en Poche (MGA)"
                 type="number"
+                pattern="[0-9]*"
                 placeholder="Ex: 1 500 000"
-                icon={<DollarSign className="h-4 w-4" />}
-                className="text-lg font-semibold bg-white dark:bg-gray-800/70"
+                suffix="MGA"
+                className="text-base sm:text-lg font-bold h-11"
                 {...register("netSalary")}
               />
               {errors.netSalary && (
-                <p className="text-xs text-red-500 font-medium mt-1">
+                <p className="text-xs font-mono text-[#A3483C] dark:text-[#D96859] mt-1">
                   {errors.netSalary.message}
                 </p>
               )}
@@ -70,118 +76,145 @@ export function CalculatorForm({
             <div>
               <Input
                 id="grossSalary"
-                label="Salaire brut de base (MGA)"
+                label="Salaire Brut de Base Contractuel (MGA)"
                 type="number"
+                pattern="[0-9]*"
                 placeholder="Ex: 2 000 000"
-                icon={<DollarSign className="h-4 w-4" />}
-                className="text-lg font-semibold bg-white dark:bg-gray-800/70"
+                suffix="MGA"
+                className="text-base sm:text-lg font-bold h-11"
                 {...register("grossSalary")}
               />
+              {errors.grossSalary && (
+                <p className="text-xs font-mono text-[#A3483C] dark:text-[#D96859] mt-1">
+                  {errors.grossSalary.message}
+                </p>
+              )}
             </div>
           )}
 
-          {/* Boutons de raccourci rapide */}
+          {/* Barème des Préréglages Rapides */}
           {onApplyPreset && (
-            <div className="mt-3.5 flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-bold text-gray-800 dark:text-gray-200 flex items-center gap-1.5">
-                <Zap className="h-3.5 w-3.5 text-amber-500 fill-amber-400" /> Préréglages :
-              </span>
-              {PRESETS.map((preset) => (
-                <button
-                  key={preset.value}
-                  type="button"
-                  onClick={() => onApplyPreset(preset.value)}
-                  className="text-xs px-2.5 py-1 rounded-lg bg-white dark:bg-gray-800 text-emerald-950 dark:text-emerald-100 font-bold border border-emerald-300 dark:border-emerald-700/60 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 dark:hover:bg-emerald-500 dark:hover:text-white transition-all shadow-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer active:scale-95"
-                >
-                  {preset.label}
-                </button>
-              ))}
+            <div className="pt-2 border-t border-[#E2DDD5] dark:border-[#24303E]">
+              <div className="flex items-center justify-between text-[11px] font-mono text-[#666159] dark:text-[#9E9A90] mb-1.5">
+                <span>Barème de référence rapide (MGA) :</span>
+              </div>
+              <div className="grid grid-cols-2 xs:grid-cols-3 sm:flex sm:flex-wrap items-center gap-1.5">
+                {PRESETS.map((preset) => (
+                  <button
+                    key={preset.value}
+                    type="button"
+                    onClick={() => {
+                      if (navigator.vibrate) navigator.vibrate(10);
+                      onApplyPreset(preset.value);
+                    }}
+                    className="text-[11px] font-mono py-2 px-2.5 min-h-[40px] sm:min-h-[32px] rounded-sm bg-[#FFFFFF] dark:bg-[#18202A] text-[#24221F] dark:text-[#EAE7E1] border border-[#E2DDD5] dark:border-[#24303E] hover:border-[#3F7D5C] hover:text-[#3F7D5C] dark:hover:border-[#4E9B73] dark:hover:text-[#4E9B73] active:scale-95 transition-colors cursor-pointer text-center"
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
 
-        {/* Options additionnelles */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div>
-            <Input
-              id="bonuses"
-              label="Primes (MGA)"
-              type="number"
-              placeholder="0"
-              icon={<Gift className="h-4 w-4 text-emerald-500" />}
-              {...register("bonuses")}
-            />
-            {errors.bonuses && (
-              <p className="text-xs text-red-500 mt-1">
-                {errors.bonuses.message}
-              </p>
-            )}
+        {/* Section 2 : Compléments de rémunération & Déductions */}
+        <div className="space-y-3 pt-1">
+          <span className="text-[10px] font-mono font-bold tracking-widest text-[#666159] dark:text-[#9E9A90] uppercase block">
+            Éléments complémentaires & Situation
+          </span>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div>
+              <Input
+                id="bonuses"
+                label="Primes (MGA)"
+                type="number"
+                placeholder="0"
+                suffix="MGA"
+                {...register("bonuses")}
+              />
+              {errors.bonuses && (
+                <p className="text-xs font-mono text-[#A3483C] dark:text-[#D96859] mt-1">
+                  {errors.bonuses.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <Input
+                id="allowances"
+                label="Indemnités (MGA)"
+                type="number"
+                placeholder="0"
+                suffix="MGA"
+                {...register("allowances")}
+              />
+              {errors.allowances && (
+                <p className="text-xs font-mono text-[#A3483C] dark:text-[#D96859] mt-1">
+                  {errors.allowances.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <Input
+                id="otherGains"
+                label="Autres gains (MGA)"
+                type="number"
+                placeholder="0"
+                suffix="MGA"
+                {...register("otherGains")}
+              />
+              {errors.otherGains && (
+                <p className="text-xs font-mono text-[#A3483C] dark:text-[#D96859] mt-1">
+                  {errors.otherGains.message}
+                </p>
+              )}
+            </div>
           </div>
+
           <div>
             <Input
-              id="allowances"
-              label="Indemnités"
+              id="dependents"
+              label="Personnes à charge (Déduction 2 000 MGA/pers)"
               type="number"
               placeholder="0"
-              icon={<Briefcase className="h-4 w-4 text-blue-500" />}
-              {...register("allowances")}
+              min="0"
+              max="20"
+              suffix="pers."
+              {...register("dependents")}
             />
-            {errors.allowances && (
-              <p className="text-xs text-red-500 mt-1">
-                {errors.allowances.message}
-              </p>
-            )}
-          </div>
-          <div>
-            <Input
-              id="otherGains"
-              label="Autres gains"
-              type="number"
-              placeholder="0"
-              icon={<Plus className="h-4 w-4 text-amber-500" />}
-              {...register("otherGains")}
-            />
-            {errors.otherGains && (
-              <p className="text-xs text-red-500 mt-1">
-                {errors.otherGains.message}
+            {errors.dependents && (
+              <p className="text-xs font-mono text-[#A3483C] dark:text-[#D96859] mt-1">
+                {errors.dependents.message}
               </p>
             )}
           </div>
         </div>
 
-        {/* Personnes à charge */}
-        <div>
-          <Input
-            id="dependents"
-            label="Personnes à charge (Réduction IRSA 2000 MGA/pers)"
-            type="number"
-            placeholder="0"
-            min="0"
-            max="20"
-            icon={<Users className="h-4 w-4 text-indigo-500" />}
-            {...register("dependents")}
-          />
-          {errors.dependents && (
-            <p className="text-xs text-red-500 mt-1">
-              {errors.dependents.message}
-            </p>
-          )}
+        {/* Basculer le mode de calcul */}
+        <div className="pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onToggleMode}
+            className="w-full gap-2 text-xs font-mono py-2 text-[#666159] dark:text-[#9E9A90] hover:text-[#24221F] dark:hover:text-[#EAE7E1]"
+          >
+            <ArrowLeftRight className="h-3.5 w-3.5 text-[#3F7D5C] dark:text-[#4E9B73]" />
+            {isNetToGross
+              ? "Basculer vers le mode : Brut → Net"
+              : "Basculer vers le mode : Net → Brut"}
+          </Button>
         </div>
 
-        {/* Basculer le mode */}
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={onToggleMode}
-          className="w-full gap-2 text-xs font-semibold py-2.5 border-emerald-200 dark:border-gray-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300 transition-colors"
-        >
-          <ArrowLeftRight className="h-3.5 w-3.5" />
-          {isNetToGross
-            ? "Passer en mode Brut → Net"
-            : "Passer en mode Net → Brut"}
-        </Button>
+        {/* Note fiscale légale */}
+        <div className="flex items-start gap-1.5 p-2.5 rounded-sm bg-[#FAF8F5] dark:bg-[#141C25] border border-[#E2DDD5] dark:border-[#24303E] text-[11px] text-[#666159] dark:text-[#9E9A90]">
+          <HelpCircle className="h-3.5 w-3.5 shrink-0 text-[#3F7D5C] dark:text-[#4E9B73] mt-0.5" />
+          <span>
+            CNAPS (1% plafonné à 24 000 MGA) · OSTIE (1% plafonné à 24 000 MGA) · IRSA minimum 3 000 MGA.
+          </span>
+        </div>
       </CardContent>
     </Card>
   );
 }
+

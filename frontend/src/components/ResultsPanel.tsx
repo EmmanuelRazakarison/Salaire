@@ -1,26 +1,25 @@
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Download,
   Copy,
   Save,
-  Wallet,
-  Calculator,
+  CheckCircle2,
   ChevronDown,
   ChevronUp,
   Building2,
   User,
-  Coins,
   ArrowRightLeft,
+  FileSpreadsheet,
+  Coins,
+  Share2,
 } from "lucide-react";
 import { useState, useCallback } from "react";
-import { Card, CardContent } from "./ui/card";
+import { Card, CardContent, CardHeader } from "./ui/card";
 import { Button } from "./ui/button";
-import { Separator } from "./ui/separator";
 import { SalaryChart } from "./SalaryChart";
 import { CompareModal } from "./CompareModal";
 import type { SalaryResult, CurrencyMode, HistoryEntry } from "../types";
 import { formatCurrency } from "../utils/calculations";
-import { exportToPDF, copyToClipboard } from "../utils/export";
+import { shareOrExportPDF, copyToClipboard } from "../utils/export";
 
 interface ResultsPanelProps {
   result: SalaryResult;
@@ -29,7 +28,12 @@ interface ResultsPanelProps {
   history?: HistoryEntry[];
 }
 
-export function ResultsPanel({ result, isNetToGross, onSave, history = [] }: ResultsPanelProps) {
+export function ResultsPanel({
+  result,
+  isNetToGross,
+  onSave,
+  history = [],
+}: ResultsPanelProps) {
   const [showDetails, setShowDetails] = useState(true);
   const [copied, setCopied] = useState(false);
   const [currency, setCurrency] = useState<CurrencyMode>("MGA");
@@ -52,34 +56,34 @@ export function ResultsPanel({ result, isNetToGross, onSave, history = [] }: Res
           {
             name: "Salaire net",
             value: result.netPay,
-            color: "#10b981",
+            color: "#3F7D5C",
           },
           {
-            name: "CNAPS + OSTIE (1%+1%)",
+            name: "Cotisations (CNAPS+OSTIE)",
             value: result.totalSocialContributions,
-            color: "#f59e0b",
+            color: "#A3483C",
           },
           {
-            name: "IRSA",
+            name: "Impôt IRSA",
             value: result.irsaTax,
-            color: "#ef4444",
+            color: "#8D3B30",
           },
         ]
       : [
           {
             name: "Salaire brut",
             value: result.grossSalary,
-            color: "#3b82f6",
+            color: "#3B647A",
           },
           {
             name: "CNAPS Patronal (13%)",
             value: result.cnapsEmployer,
-            color: "#8b5cf6",
+            color: "#5F8DA8",
           },
           {
             name: "OSTIE Patronal (5%)",
             value: result.ostieEmployer,
-            color: "#ec4899",
+            color: "#7A9FB5",
           },
         ];
 
@@ -87,343 +91,414 @@ export function ResultsPanel({ result, isNetToGross, onSave, history = [] }: Res
     <>
       <AnimatePresence>
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
+          transition={{ duration: 0.25 }}
           className="space-y-4"
         >
-          {/* Barre de contrôle : Devise & Onglets */}
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700">
+          {/* Barre de contrôle du registre (Onglets vue + Bascule devise) */}
+          <div className="flex items-center justify-between gap-2 flex-wrap pb-1">
+            <div className="inline-flex rounded-md border border-[#E2DDD5] dark:border-[#24303E] bg-[#FAF8F5] dark:bg-[#141C25] p-0.5 text-xs font-medium">
               <button
                 onClick={() => setViewTab("employee")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm transition-colors cursor-pointer ${
                   viewTab === "employee"
-                    ? "bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-300 shadow-xs"
-                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                    ? "bg-[#FFFFFF] dark:bg-[#18202A] text-[#24221F] dark:text-[#EAE7E1] font-bold border border-[#E2DDD5] dark:border-[#24303E]"
+                    : "text-[#666159] dark:text-[#9E9A90] hover:text-[#24221F] dark:hover:text-[#EAE7E1]"
                 }`}
               >
-                <User className="h-3.5 w-3.5" />
-                Vue Salarié
+                <User className="h-3.5 w-3.5 text-[#3F7D5C] dark:text-[#4E9B73]" />
+                Vue Salarié (Net)
               </button>
               <button
                 onClick={() => setViewTab("employer")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm transition-colors cursor-pointer ${
                   viewTab === "employer"
-                    ? "bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-300 shadow-xs"
-                    : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                    ? "bg-[#FFFFFF] dark:bg-[#18202A] text-[#24221F] dark:text-[#EAE7E1] font-bold border border-[#E2DDD5] dark:border-[#24303E]"
+                    : "text-[#666159] dark:text-[#9E9A90] hover:text-[#24221F] dark:hover:text-[#EAE7E1]"
                 }`}
               >
-                <Building2 className="h-3.5 w-3.5" />
+                <Building2 className="h-3.5 w-3.5 text-[#3B647A] dark:text-[#5F8DA8]" />
                 Coût Employeur
               </button>
             </div>
 
             <button
               onClick={toggleCurrency}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors shadow-xs"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm text-xs font-mono font-semibold bg-[#FFFFFF] dark:bg-[#18202A] text-[#666159] dark:text-[#9E9A90] border border-[#E2DDD5] dark:border-[#24303E] hover:border-[#3F7D5C] hover:text-[#3F7D5C] transition-colors cursor-pointer"
+              title="Basculer entre Ariary (MGA) et Francs Malgaches (FMG)"
             >
-              <Coins className="h-3.5 w-3.5 text-emerald-500" />
-              Devise : {currency}
+              <Coins className="h-3.5 w-3.5 text-[#3F7D5C]" />
+              Affichage : {currency}
             </button>
           </div>
 
-          {/* Résumé principal */}
-          <Card className="overflow-hidden border-emerald-200 dark:border-emerald-800/50 shadow-md">
-            <div
-              className={`p-6 text-white transition-all ${
-                viewTab === "employee"
-                  ? "bg-gradient-to-r from-emerald-500 via-teal-600 to-emerald-700"
-                  : "bg-gradient-to-r from-blue-600 via-indigo-600 to-slate-700"
-              }`}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-emerald-100 text-xs font-semibold uppercase tracking-wider">
-                  {viewTab === "employee"
-                    ? isNetToGross
-                      ? "Brut estimé"
-                      : "Salaire net en poche"
-                    : "Coût Total Employeur"}
-                </span>
-                <Wallet className="h-5 w-5 text-white/80" />
-              </div>
-              <div className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-                {viewTab === "employee"
-                  ? formatCurrency(result.netPay, currency)
-                  : formatCurrency(result.totalEmployerCost, currency)}
-              </div>
-
-              <div className="flex gap-3 mt-3 text-xs sm:text-sm text-white/90 font-medium flex-wrap">
-                <span>
-                  Brut : {formatCurrency(result.grossSalary, currency)}
-                </span>
-                <span className="opacity-50">|</span>
-                <span>
-                  Retenues : {formatCurrency(result.totalDeductions, currency)}
-                </span>
-                {viewTab === "employer" && (
-                  <>
-                    <span className="opacity-50">|</span>
-                    <span>
-                      Cotis. Patronales : {formatCurrency(result.totalEmployerContributions, currency)}
+          {/* Grand Livre de Décompte : Feuille de paie officielle */}
+          <Card className="border border-[#E2DDD5] dark:border-[#24303E] overflow-hidden">
+            {/* En-tête du registre */}
+            <CardHeader className="bg-[#FAF8F5] dark:bg-[#141C25] p-4 sm:p-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <FileSpreadsheet className="h-4 w-4 text-[#3F7D5C] dark:text-[#4E9B73]" />
+                    <span className="text-[10px] font-mono font-bold tracking-widest text-[#666159] dark:text-[#9E9A90] uppercase">
+                      BULLETIN DE SIMULATION SALARIALE N° {Date.now().toString().slice(-6)}
                     </span>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <CardContent className="pt-4 pb-3 bg-white dark:bg-gray-800/60">
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                    Cotisations Salarié
                   </div>
-                  <div className="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400">
-                    {result.grossSalary > 0
-                      ? `${((result.totalSocialContributions / result.totalGains) * 100).toFixed(1)}%`
-                      : "0%"}
+                  <h2 className="font-serif text-lg sm:text-xl font-bold tracking-tight text-[#24221F] dark:text-[#EAE7E1]">
+                    {viewTab === "employee"
+                      ? "Décompte Individuel de Rémunération"
+                      : "État Récapitulatif de la Masse Salariale"}
+                  </h2>
+                  <p className="text-[11px] font-mono text-[#666159] dark:text-[#9E9A90]">
+                    Période Mensuelle · Barème Fiscal & Cotisations Sociales 2026
+                  </p>
+                </div>
+
+                {/* Sceau de validation signature */}
+                <div className="stamp-seal self-start sm:self-auto">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-[#3F7D5C] dark:text-[#4E9B73]" />
+                  <span>Conforme Loi MG · Validé</span>
+                </div>
+              </div>
+            </CardHeader>
+
+            <CardContent className="p-0 divide-y divide-[#E2DDD5] dark:divide-[#24303E]">
+              {/* Grand Montant Clé : Net à payer ou Coût total employeur */}
+              <div className="p-4 sm:p-6 bg-[#FAF8F5]/60 dark:bg-[#141C25]/40 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+                <div>
+                  <span className="text-xs font-mono uppercase tracking-wider text-[#666159] dark:text-[#9E9A90] block mb-1">
+                    {viewTab === "employee"
+                      ? isNetToGross
+                        ? "Net souhaité (Base du calcul)"
+                        : "Net à payer au salarié (Net en poche)"
+                      : "Coût global pour l'entreprise"}
+                  </span>
+                  <div className="font-mono text-3xl sm:text-4xl font-bold text-[#3F7D5C] dark:text-[#4E9B73] tracking-tight">
+                    {viewTab === "employee"
+                      ? formatCurrency(result.netPay, currency)
+                      : formatCurrency(result.totalEmployerCost, currency)}
                   </div>
                 </div>
-                <div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                    Taux IRSA
+
+                <div className="text-xs font-mono text-[#666159] dark:text-[#9E9A90] space-y-1">
+                  <div>
+                    Salaire Brut Total :{" "}
+                    <span className="font-bold text-[#24221F] dark:text-[#EAE7E1]">
+                      {formatCurrency(result.totalGains, currency)}
+                    </span>
                   </div>
-                  <div className="text-base sm:text-lg font-bold text-red-500 dark:text-red-400">
+                  <div>
+                    Total Déductions Salariales :{" "}
+                    <span className="font-bold text-[#A3483C] dark:text-[#D96859]">
+                      - {formatCurrency(result.totalDeductions, currency)}
+                    </span>
+                  </div>
+                  {viewTab === "employer" && (
+                    <div>
+                      Charges Patronales (18%) :{" "}
+                      <span className="font-bold text-[#3B647A] dark:text-[#5F8DA8]">
+                        + {formatCurrency(result.totalEmployerContributions, currency)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Ratios & Synthèse comptable */}
+              <div className="grid grid-cols-3 divide-x divide-[#E2DDD5] dark:divide-[#24303E] bg-[#FFFFFF] dark:bg-[#18202A] text-center p-3">
+                <div className="p-2">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-[#666159] dark:text-[#9E9A90] mb-0.5">
+                    Cotis. Sociales
+                  </div>
+                  <div className="font-mono text-sm sm:text-base font-bold text-[#24221F] dark:text-[#EAE7E1]">
+                    {result.totalGains > 0
+                      ? `${((result.totalSocialContributions / result.totalGains) * 100).toFixed(1)}%`
+                      : "0.0%"}
+                  </div>
+                  <div className="text-[10px] font-mono text-[#666159] dark:text-[#9E9A90]">
+                    2% Salarial
+                  </div>
+                </div>
+
+                <div className="p-2">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-[#666159] dark:text-[#9E9A90] mb-0.5">
+                    Pression IRSA
+                  </div>
+                  <div className="font-mono text-sm sm:text-base font-bold text-[#24221F] dark:text-[#EAE7E1]">
                     {result.taxableIncome > 0
                       ? `${((result.irsaTax / result.taxableIncome) * 100).toFixed(1)}%`
-                      : "0%"}
+                      : "0.0%"}
+                  </div>
+                  <div className="text-[10px] font-mono text-[#666159] dark:text-[#9E9A90]">
+                    Barème progressif
                   </div>
                 </div>
-                <div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                    Charges Patronales
+
+                <div className="p-2">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-[#666159] dark:text-[#9E9A90] mb-0.5">
+                    Charges Entreprise
                   </div>
-                  <div className="text-base sm:text-lg font-bold text-blue-600 dark:text-blue-400">
+                  <div className="font-mono text-sm sm:text-base font-bold text-[#3B647A] dark:text-[#5F8DA8]">
                     {result.grossSalary > 0
                       ? `${((result.totalEmployerContributions / result.grossSalary) * 100).toFixed(1)}%`
-                      : "0%"}
+                      : "0.0%"}
+                  </div>
+                  <div className="text-[10px] font-mono text-[#666159] dark:text-[#9E9A90]">
+                    18% Patronal
                   </div>
                 </div>
+              </div>
+
+              {/* Tableau de décomposition ligne par ligne (Livre de paie) */}
+              <div className="p-4 sm:p-5 space-y-4">
+                <div className="flex items-center justify-between border-b border-[#E2DDD5] dark:border-[#24303E] pb-2">
+                  <div className="font-serif text-sm font-semibold text-[#24221F] dark:text-[#EAE7E1] flex items-center gap-1.5">
+                    <span>Livre des Décompositions</span>
+                  </div>
+                  <button
+                    onClick={() => setShowDetails(!showDetails)}
+                    className="text-xs font-mono text-[#666159] dark:text-[#9E9A90] hover:text-[#24221F] dark:hover:text-[#EAE7E1] flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>{showDetails ? "Masquer les lignes" : "Afficher toutes les lignes"}</span>
+                    {showDetails ? (
+                      <ChevronUp className="h-3.5 w-3.5" />
+                    ) : (
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    )}
+                  </button>
+                </div>
+
+                <AnimatePresence>
+                  {showDetails && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden space-y-5 text-xs"
+                    >
+                      {/* Section 1 : Revenus bruts */}
+                      <div className="space-y-1.5">
+                        <div className="text-[10px] font-mono font-bold tracking-widest uppercase text-[#666159] dark:text-[#9E9A90]">
+                          01. Revenus & Éléments du Brut
+                        </div>
+                        <div className="divide-y divide-[#E2DDD5]/60 dark:divide-[#24303E]/60 border-y border-[#E2DDD5] dark:border-[#24303E]">
+                          <LedgerRow
+                            code="01.01"
+                            label="Salaire de base contractuel"
+                            rate="Fixe"
+                            amount={formatCurrency(result.grossSalary, currency)}
+                          />
+                          {result.bonuses > 0 && (
+                            <LedgerRow
+                              code="01.02"
+                              label="Primes & Gratifications"
+                              rate="Variable"
+                              amount={formatCurrency(result.bonuses, currency)}
+                            />
+                          )}
+                          {result.allowances > 0 && (
+                            <LedgerRow
+                              code="01.03"
+                              label="Indemnités non exonérées"
+                              rate="Variable"
+                              amount={formatCurrency(result.allowances, currency)}
+                            />
+                          )}
+                          {result.otherGains > 0 && (
+                            <LedgerRow
+                              code="01.04"
+                              label="Autres avantages & gains bruts"
+                              rate="Divers"
+                              amount={formatCurrency(result.otherGains, currency)}
+                            />
+                          )}
+                          <LedgerRow
+                            code="01.00"
+                            label="Total Revenus Bruts (Brut Global)"
+                            rate="100%"
+                            amount={formatCurrency(result.totalGains, currency)}
+                            isTotal
+                          />
+                        </div>
+                      </div>
+
+                      {/* Section 2 : Cotisations Salariales */}
+                      <div className="space-y-1.5">
+                        <div className="text-[10px] font-mono font-bold tracking-widest uppercase text-[#666159] dark:text-[#9E9A90]">
+                          02. Cotisations Sociales Salariales (2%)
+                        </div>
+                        <div className="divide-y divide-[#E2DDD5]/60 dark:divide-[#24303E]/60 border-y border-[#E2DDD5] dark:border-[#24303E]">
+                          <LedgerRow
+                            code="02.01"
+                            label="CNAPS Salarié (Caisse Nationale de Prévoyance)"
+                            rate="1% (Plafond 2 400 000 MGA)"
+                            amount={`- ${formatCurrency(result.cnapsEmployee, currency)}`}
+                            color="deduction"
+                          />
+                          <LedgerRow
+                            code="02.02"
+                            label="OSTIE / Médical Salarié"
+                            rate="1% (Plafond 2 400 000 MGA)"
+                            amount={`- ${formatCurrency(result.ostieEmployee, currency)}`}
+                            color="deduction"
+                          />
+                          <LedgerRow
+                            code="02.00"
+                            label="Total Cotisations Sociales Salariales"
+                            rate="2% max 48 000 MGA"
+                            amount={`- ${formatCurrency(result.totalSocialContributions, currency)}`}
+                            isTotal
+                            color="deduction"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Section 3 : IRSA */}
+                      <div className="space-y-1.5">
+                        <div className="text-[10px] font-mono font-bold tracking-widest uppercase text-[#666159] dark:text-[#9E9A90]">
+                          03. Impôt sur le Revenu des Salariés (IRSA 2026)
+                        </div>
+                        <div className="divide-y divide-[#E2DDD5]/60 dark:divide-[#24303E]/60 border-y border-[#E2DDD5] dark:border-[#24303E]">
+                          <LedgerRow
+                            code="03.00"
+                            label="Assiette Fiscale (Net Imposable = Brut - Cotisations)"
+                            rate="Base"
+                            amount={formatCurrency(result.taxableIncome, currency)}
+                          />
+                          {result.irsaDetails.map((detail, index) => (
+                            <LedgerRow
+                              key={index}
+                              code={`03.0${index + 1}`}
+                              label={`Barème Tranche ${detail.rate} (${detail.bracket})`}
+                              rate={detail.rate}
+                              amount={
+                                detail.tax < 0
+                                  ? `- ${formatCurrency(Math.abs(detail.tax), currency)}`
+                                  : `${formatCurrency(detail.tax, currency)}`
+                              }
+                              color={detail.tax < 0 ? "validated" : undefined}
+                              isSub
+                            />
+                          ))}
+                          <LedgerRow
+                            code="03.99"
+                            label="Total Impôt IRSA Net à Retenir"
+                            rate="Barème légal"
+                            amount={`- ${formatCurrency(result.irsaTax, currency)}`}
+                            isTotal
+                            color="deduction"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Section 4 : Récapitulatif Salarié */}
+                      <div className="p-3.5 rounded-sm bg-[#EBF4EF] dark:bg-[#162B21] border border-[#3F7D5C]/30 space-y-2">
+                        <div className="flex items-center justify-between text-xs font-mono">
+                          <span className="text-[#2F6347] dark:text-[#62BD8F]">Total Retenues Salariales (Cotisations + IRSA) :</span>
+                          <span className="font-bold text-[#A3483C] dark:text-[#D96859]">
+                            - {formatCurrency(result.totalDeductions, currency)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm sm:text-base font-mono font-bold pt-1 border-t border-[#3F7D5C]/20 ledger-double-line pb-1">
+                          <span className="font-serif text-[#2F6347] dark:text-[#62BD8F]">
+                            NET À PAYER AU SALARIÉ
+                          </span>
+                          <span className="text-[#2F6347] dark:text-[#62BD8F] text-base sm:text-lg">
+                            {formatCurrency(result.netPay, currency)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Section 5 : Charges Patronales */}
+                      <div className="space-y-1.5 pt-1">
+                        <div className="text-[10px] font-mono font-bold tracking-widest uppercase text-[#3B647A] dark:text-[#5F8DA8]">
+                          04. Cotisations & Charges Patronales (18%)
+                        </div>
+                        <div className="divide-y divide-[#E2DDD5]/60 dark:divide-[#24303E]/60 border-y border-[#E2DDD5] dark:border-[#24303E]">
+                          <LedgerRow
+                            code="04.01"
+                            label="CNAPS Employeur (13% - Plafond 2 400 000 MGA)"
+                            rate="13%"
+                            amount={formatCurrency(result.cnapsEmployer, currency)}
+                            color="charge"
+                          />
+                          <LedgerRow
+                            code="04.02"
+                            label="OSTIE / Médical Employeur (5% - Plafond 2 400 000 MGA)"
+                            rate="5%"
+                            amount={formatCurrency(result.ostieEmployer, currency)}
+                            color="charge"
+                          />
+                          <LedgerRow
+                            code="04.00"
+                            label="Total Charges Sociales Patronales"
+                            rate="18%"
+                            amount={formatCurrency(result.totalEmployerContributions, currency)}
+                            isTotal
+                            color="charge"
+                          />
+                          <LedgerRow
+                            code="05.00"
+                            label="COÛT GLOBAL SALARIAL DE L'ENTREPRISE"
+                            rate="Brut + Charges"
+                            amount={formatCurrency(result.totalEmployerCost, currency)}
+                            isTotal
+                            color="charge"
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </CardContent>
           </Card>
 
-          {/* Graphique */}
+          {/* Graphique de répartition du salaire */}
           <SalaryChart data={chartData} />
 
-          {/* Détails déroulants */}
-          <Card className="border-gray-200 dark:border-gray-800">
-            <button
-              onClick={() => setShowDetails(!showDetails)}
-              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors rounded-t-2xl"
-            >
-              <div className="flex items-center gap-2">
-                <Calculator className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                <span className="font-semibold text-sm text-gray-900 dark:text-gray-100">
-                  Détail complet du bulletin ({currency})
-                </span>
-              </div>
-              {showDetails ? (
-                <ChevronUp className="h-4 w-4 text-gray-400" />
-              ) : (
-                <ChevronDown className="h-4 w-4 text-gray-400" />
-              )}
-            </button>
-
-            <AnimatePresence>
-              {showDetails && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
-                >
-                  <CardContent className="pt-0 space-y-4">
-                    {/* Section Revenus */}
-                    <div>
-                      <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-                        1. Revenus Brut & Gains
-                      </h4>
-                      <div className="space-y-1.5">
-                        <DetailRow
-                          label="Salaire de base (brut)"
-                          value={formatCurrency(result.grossSalary, currency)}
-                        />
-                        {result.bonuses > 0 && (
-                          <DetailRow
-                            label="Primes"
-                            value={formatCurrency(result.bonuses, currency)}
-                          />
-                        )}
-                        {result.allowances > 0 && (
-                          <DetailRow
-                            label="Indemnités"
-                            value={formatCurrency(result.allowances, currency)}
-                          />
-                        )}
-                        {result.otherGains > 0 && (
-                          <DetailRow
-                            label="Autres gains"
-                            value={formatCurrency(result.otherGains, currency)}
-                          />
-                        )}
-                        <DetailRow
-                          label="Total gains bruts"
-                          value={formatCurrency(result.totalGains, currency)}
-                          bold
-                        />
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Section Cotisations Salariales */}
-                    <div>
-                      <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-                        2. Cotisations Salariales (Retenues)
-                      </h4>
-                      <div className="space-y-1.5">
-                        <DetailRow
-                          label="CNAPS employé (1% plafonné 2,4M)"
-                          value={formatCurrency(result.cnapsEmployee, currency)}
-                          highlight="amber"
-                        />
-                        <DetailRow
-                          label="OSTIE employé (1% plafonné 2,4M)"
-                          value={formatCurrency(result.ostieEmployee, currency)}
-                          highlight="amber"
-                        />
-                        <DetailRow
-                          label="Total cotisations sociales"
-                          value={formatCurrency(result.totalSocialContributions, currency)}
-                          bold
-                          highlight="amber"
-                        />
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Section IRSA */}
-                    <div>
-                      <h4 className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-                        3. Impôt sur le Revenu (IRSA)
-                      </h4>
-                      <div className="space-y-1.5">
-                        <DetailRow
-                          label="Net imposable"
-                          value={formatCurrency(result.taxableIncome, currency)}
-                        />
-                        {result.irsaDetails.map((detail, i) => (
-                          <DetailRow
-                            key={i}
-                            label={`Tranche ${detail.rate} (${detail.bracket})`}
-                            value={
-                              detail.tax < 0
-                                ? `- ${formatCurrency(Math.abs(detail.tax), currency)}`
-                                : formatCurrency(detail.tax, currency)
-                            }
-                            highlight={detail.tax < 0 ? "green" : "red"}
-                            small
-                          />
-                        ))}
-                        <DetailRow
-                          label="Montant IRSA net à retenir"
-                          value={formatCurrency(result.irsaTax, currency)}
-                          bold
-                          highlight="red"
-                        />
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Section Cotisations Patronales */}
-                    <div>
-                      <h4 className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                        <Building2 className="h-3.5 w-3.5" /> 4. Cotisations Patronales (Employeur)
-                      </h4>
-                      <div className="space-y-1.5">
-                        <DetailRow
-                          label="CNAPS Employeur (13% plafonné 2,4M)"
-                          value={formatCurrency(result.cnapsEmployer, currency)}
-                          highlight="blue"
-                        />
-                        <DetailRow
-                          label="OSTIE / Médical Employeur (5% plafonné 2,4M)"
-                          value={formatCurrency(result.ostieEmployer, currency)}
-                          highlight="blue"
-                        />
-                        <DetailRow
-                          label="Total charges patronales"
-                          value={formatCurrency(result.totalEmployerContributions, currency)}
-                          bold
-                          highlight="blue"
-                        />
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Recap global */}
-                    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/30 rounded-xl p-3.5 border border-emerald-100 dark:border-emerald-800/30 space-y-2">
-                      <DetailRow
-                        label="Total déductions salariales"
-                        value={formatCurrency(result.totalDeductions, currency)}
-                        bold
-                      />
-                      <DetailRow
-                        label="NET À PAYER AU SALARIÉ"
-                        value={formatCurrency(result.netPay, currency)}
-                        bold
-                        highlight="green"
-                      />
-                      <DetailRow
-                        label="COÛT GLOBAL EMPLOYEUR"
-                        value={formatCurrency(result.totalEmployerCost, currency)}
-                        bold
-                        highlight="blue"
-                      />
-                    </div>
-                  </CardContent>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </Card>
-
-          {/* Boutons d'actions */}
-          <div className="flex gap-2 flex-wrap pt-1">
+          {/* Barre d'actions du registre (Mobile & Desktop) */}
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 pt-1">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => exportToPDF(result, isNetToGross)}
-              className="gap-2 font-semibold"
+              onClick={() => shareOrExportPDF(result, isNetToGross)}
+              className="gap-1.5 font-mono text-xs h-9 min-h-[38px] justify-center"
+              title="Exporter ou partager le bulletin officiel en PDF"
             >
-              <Download className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-              Bulletin PDF
+              <Share2 className="h-3.5 w-3.5 text-[#3F7D5C] dark:text-[#4E9B73]" />
+              Partager / PDF
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={() => setIsCompareOpen(true)}
-              className="gap-2 font-semibold border-amber-300 dark:border-amber-700/60 text-amber-800 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/30"
+              className="gap-1.5 font-mono text-xs h-9 min-h-[38px] justify-center"
+              title="Comparer avec une autre proposition salariale"
             >
-              <ArrowRightLeft className="h-4 w-4 text-amber-500" />
-              Comparateur
+              <ArrowRightLeft className="h-3.5 w-3.5 text-[#3B647A] dark:text-[#5F8DA8]" />
+              Comparer
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={handleCopy}
-              className="gap-2 font-semibold"
+              className="gap-1.5 font-mono text-xs h-9 min-h-[38px] justify-center"
+              title="Copier le décompte textuel"
             >
-              <Copy className="h-4 w-4" />
+              <Copy className="h-3.5 w-3.5 text-[#666159]" />
               {copied ? "Copié !" : "Copier"}
             </Button>
             {onSave && (
-              <Button size="sm" onClick={onSave} className="gap-2 ml-auto bg-emerald-600 hover:bg-emerald-700 font-semibold shadow-xs">
-                <Save className="h-4 w-4" />
+              <Button
+                size="sm"
+                onClick={onSave}
+                className="gap-1.5 font-mono text-xs h-9 min-h-[38px] justify-center sm:ml-auto"
+                title="Consigner dans le journal de l'application"
+              >
+                <Save className="h-3.5 w-3.5" />
                 Sauvegarder
               </Button>
             )}
@@ -441,40 +516,58 @@ export function ResultsPanel({ result, isNetToGross, onSave, history = [] }: Res
   );
 }
 
-interface DetailRowProps {
+interface LedgerRowProps {
+  code: string;
   label: string;
-  value: string;
-  bold?: boolean;
-  highlight?: "amber" | "red" | "green" | "blue";
-  small?: boolean;
+  rate: string;
+  amount: string;
+  isTotal?: boolean;
+  isSub?: boolean;
+  color?: "validated" | "deduction" | "charge";
 }
 
-function DetailRow({ label, value, bold, highlight, small }: DetailRowProps) {
-  const valueColors = {
-    amber: "text-amber-600 dark:text-amber-400",
-    red: "text-red-600 dark:text-red-400",
-    green: "text-emerald-600 dark:text-emerald-400 font-bold text-base",
-    blue: "text-blue-600 dark:text-blue-400",
+function LedgerRow({
+  code,
+  label,
+  rate,
+  amount,
+  isTotal,
+  isSub,
+  color,
+}: LedgerRowProps) {
+  const colorClasses = {
+    validated: "text-[#3F7D5C] dark:text-[#4E9B73]",
+    deduction: "text-[#A3483C] dark:text-[#D96859]",
+    charge: "text-[#3B647A] dark:text-[#5F8DA8]",
   };
 
   return (
-    <div className="flex items-center justify-between">
-      <span
-        className={`${
-          small ? "text-xs" : "text-sm"
-        } text-gray-600 dark:text-gray-400 font-medium`}
-      >
+    <div
+      className={`grid grid-cols-12 gap-2 py-1.5 items-center ${
+        isTotal
+          ? "font-bold bg-[#FAF8F5]/80 dark:bg-[#141C25]/80 px-2 rounded-sm"
+          : isSub
+          ? "pl-4 text-[#666159] dark:text-[#9E9A90]"
+          : "text-[#24221F] dark:text-[#EAE7E1]"
+      }`}
+    >
+      <div className="col-span-1 hidden sm:block font-mono text-[10px] text-[#9E978C] dark:text-[#67635A]">
+        {code}
+      </div>
+      <div className="col-span-8 sm:col-span-6 font-sans truncate">
         {label}
-      </span>
-      <span
-        className={`${
-          small ? "text-xs" : "text-sm"
-        } ${bold ? "font-bold" : ""} ${
-          highlight ? valueColors[highlight] : "text-gray-900 dark:text-gray-100"
+      </div>
+      <div className="col-span-2 hidden sm:block font-mono text-[11px] text-[#666159] dark:text-[#9E9A90] text-right">
+        {rate}
+      </div>
+      <div
+        className={`col-span-4 sm:col-span-3 font-mono text-right tabular-nums font-semibold ${
+          color ? colorClasses[color] : ""
         }`}
       >
-        {value}
-      </span>
+        {amount}
+      </div>
     </div>
   );
 }
+
