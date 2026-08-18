@@ -1,4 +1,4 @@
-import { BookOpen, Shield, Bell } from "lucide-react";
+import { BookOpen, Shield, Bell, Coins } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "./ui/button";
 
@@ -7,6 +7,7 @@ interface HeaderProps {
   isPinEnabled?: boolean;
   onOpenSecurity?: () => void;
   onOpenPayReminder?: () => void;
+  onOpenCurrencyConverter?: () => void;
 }
 
 export function Header({
@@ -14,6 +15,7 @@ export function Header({
   isPinEnabled = false,
   onOpenSecurity,
   onOpenPayReminder,
+  onOpenCurrencyConverter,
 }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[#E2DDD5] dark:border-[#24303E] bg-[#F7F5F0]/95 dark:bg-[#12181F]/95 backdrop-blur-md transition-colors">
@@ -40,6 +42,20 @@ export function Header({
 
         {/* Contrôles & Statut */}
         <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Bouton Convertisseur Devises / FMG */}
+          {onOpenCurrencyConverter && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onOpenCurrencyConverter}
+              className="h-8 px-2 sm:px-2.5 rounded-sm text-[#2F6347] dark:text-[#62BD8F] bg-[#EBF4EF] dark:bg-[#162B21] border-[#3F7D5C]/30 hover:border-[#3F7D5C] gap-1.5 text-xs font-mono font-semibold"
+              title="Convertisseur de devises en direct (MGA, FMG, USD, EUR, CNY)"
+            >
+              <Coins className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Devises</span>
+            </Button>
+          )}
+
           {/* Bouton Rappel de Paie */}
           {onOpenPayReminder && (
             <Button

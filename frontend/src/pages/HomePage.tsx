@@ -8,6 +8,7 @@ import { ResultsSkeleton } from "../components/ResultsSkeleton";
 import { HistoryPanel } from "../components/HistoryPanel";
 import { SecurityModal, LockScreen } from "../components/SecurityModal";
 import { PayReminderModal } from "../components/PayReminderModal";
+import { CurrencyConverterModal } from "../components/CurrencyConverterModal";
 import { useSalaryCalculation } from "../hooks/useSalaryCalculation";
 import { useHistory } from "../hooks/useHistory";
 import { useSecurityLock } from "../hooks/useSecurityLock";
@@ -45,8 +46,21 @@ export function HomePage() {
 
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
   const [isPayReminderOpen, setIsPayReminderOpen] = useState(false);
+  const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
 
   const lastSavedRef = useRef<string>("");
+
+  // Appliquer le montant converti vers le formulaire de salaire
+  const handleApplyConvertedAmount = useCallback(
+    (amountInMga: number) => {
+      if (isNetToGross) {
+        setValue("netSalary", amountInMga.toString(), { shouldValidate: true });
+      } else {
+        setValue("grossSalary", amountInMga.toString(), { shouldValidate: true });
+      }
+    },
+    [isNetToGross, setValue]
+  );
 
   // Sauvegarder automatiquement dans l'historique avec debounce
   useEffect(() => {
@@ -104,6 +118,7 @@ export function HomePage() {
         isPinEnabled={isPinEnabled}
         onOpenSecurity={() => setIsSecurityModalOpen(true)}
         onOpenPayReminder={() => setIsPayReminderOpen(true)}
+        onOpenCurrencyConverter={() => setIsCurrencyModalOpen(true)}
       />
 
       <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-7 space-y-4 sm:space-y-6">
@@ -218,6 +233,12 @@ export function HomePage() {
       <PayReminderModal
         isOpen={isPayReminderOpen}
         onClose={() => setIsPayReminderOpen(false)}
+      />
+
+      <CurrencyConverterModal
+        isOpen={isCurrencyModalOpen}
+        onClose={() => setIsCurrencyModalOpen(false)}
+        onApplySalaryAmount={handleApplyConvertedAmount}
       />
     </div>
   );
