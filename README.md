@@ -201,6 +201,16 @@ python -m py_compile main.py services/calculator.py api/routes.py
 
 ---
 
+## 💻 Compilation pour Android
+
+### 1. Générer l'APK
+```bash
+cd frontend
+npx @tauri-apps/cli android build -- --apk
+```
+
+---
+
 ## 📝 Licence
 
 Projet développé sous licence MIT. Libre d'utilisation pour la gestion de la paie et la simulation salariale à Madagascar.

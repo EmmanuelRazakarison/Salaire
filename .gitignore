@@ -56,3 +56,15 @@ Thumbs.db
 # Agent & Brain artifacts
 .brain/
 scratch/
+
+# Tauri, Rust & Android
+frontend/src-tauri/target/
+frontend/src-tauri/gen/schemas
+frontend/src-tauri/.cargo/
+frontend/src-tauri/gen/android/.gradle/
+frontend/src-tauri/gen/android/build/
+frontend/src-tauri/gen/android/app/build/
+*.apk
+*.aab
+*.keystore
+*.jks
